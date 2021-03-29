@@ -9,7 +9,7 @@ setuptools.setup(
     long_description=open('README.md').read(),
     packages=setuptools.find_packages(),
     install_requires=["mutagen", "hashlib"],
-	python_requires=[">=3.8","<4"],
+	python_requires=">=3.8, <4",
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
