@@ -8,7 +8,7 @@ setuptools.setup(
     description="Sekalainen kattaus tiedostonhallintatyökaluja",
     long_description=open('README.md').read(),
     packages=setuptools.find_packages(),
-    install_requires=["mutagen", "hashlib"],
+    install_requires=["mutagen"],
 	python_requires=">=3.8, <4",
     classifiers=[
         'Programming Language :: Python',
