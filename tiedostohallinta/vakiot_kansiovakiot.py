@@ -24,6 +24,7 @@ LOKAALIT_TIETOKANNAT = {
                        "Screenshots": []
                        }
 MUSATIEDOSTOT        = ["mp3", "flac", "wma", "ogg"]
+KIELLETYT            = []
 ETAPALVELIN          = "pettankone"
 VOIMASUHTEET         = {
                        "Musiikki":    (False, 0),
@@ -197,6 +198,7 @@ def aseta_vakiot():
                                                "INTERNET":    json.loads(config.get(ASETUSKOKOONPANO,"etakone tietokannat internet")),
                                                "Screenshots": json.loads(config.get(ASETUSKOKOONPANO,"etakone tietokannat screenshots"))
                                                }
+		KIELLETYT                           = json.loads(config.get(ASETUSKOKOONPANO,"kielletyt tiedostomuodot"))
 		MUSATIEDOSTOT                       = json.loads(config.get(ASETUSKOKOONPANO,"sallitut tiedostomuodot"))
 		ETAPALVELIN                         = config.get(ASETUSKOKOONPANO,"etapalvelin")
 

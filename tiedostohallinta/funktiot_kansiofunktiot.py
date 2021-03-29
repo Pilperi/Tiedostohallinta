@@ -32,9 +32,6 @@ def lataa(vaintiedosto, lahdepalvelin, lahdepolku, kohdepalvelin, kohdepolku):
 	else:
 		koodi = subprocess.call(["scp","-r", "-T", kansiopolku, kohde])
 	return(True)
-	# if koodi != 1:
-		# return(True)
-	# return(False)
 
 def siisti_tiedostonimi(nimi):
 	'''
