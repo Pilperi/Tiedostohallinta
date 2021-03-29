@@ -34,16 +34,9 @@ VOIMASUHTEET         = {
 
 
 # Tunnista käytettävä kone kotikansion perusteella.
-LOKAALI_KONE = None
-if os.path.exists("/home/pilperi"):
-	LOKAALI_KONE = "pilperi"
-elif os.path.exists("/home/taira"):
-	LOKAALI_KONE = "pettankone"
-elif os.path.exists("/home/olkkari"):
-	LOKAALI_KONE = "olkkari"
-if VERBOOSI and LOKAALI_KONE is None:
-	print("Käytettävää tietokonetta ei kyetty määrittämään...")
-elif VERBOOSI:
+KOTIKANSIO = os.path.expanduser("~")
+LOKAALI_KONE = os.path.basename(KOTIKANSIO)
+if VERBOOSI:
 	print(f"Lokaali kone: {LOKAALI_KONE}")
 
 # Luetaan asetukset INI-tiedostosta, jos sellainen löytyy.
@@ -179,6 +172,7 @@ def aseta_vakiot():
 	global ETAPALVELIN
 	global LOKAALIT_TIETOKANNAT
 	global ETAPALVELIN_TIETOKANNAT
+	global VOIMASUHTEET
 
 	# Asetetaan vakioihin, jos asetuskokoonpano määritelty
 	if ASETUSKOKOONPANO in config:
@@ -201,6 +195,9 @@ def aseta_vakiot():
 		KIELLETYT                           = json.loads(config.get(ASETUSKOKOONPANO,"kielletyt tiedostomuodot"))
 		MUSATIEDOSTOT                       = json.loads(config.get(ASETUSKOKOONPANO,"sallitut tiedostomuodot"))
 		ETAPALVELIN                         = config.get(ASETUSKOKOONPANO,"etapalvelin")
+		VOIMASUHTEET                        = {"Musiikki": config.get(ASETUSKOKOONPANO,"masteri musiikki"),
+                                               "INTERNET": config.get(ASETUSKOKOONPANO,"masteri internet"),
+                                               "Screenshots": config.get(ASETUSKOKOONPANO,"masteri screenshots")}
 
 	# Tällaisia asetuksia ei ole, mistä moiset keksit?
 	elif VERBOOSI:
