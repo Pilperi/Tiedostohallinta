@@ -216,3 +216,15 @@ def luo_tiedostolista(kansio):
 		else:
 			tiedostopolkulista += luo_tiedostolista(os.path.join(kansio, tiedosto))
 	return(tiedostopolkulista)
+
+def etapoisto(vaintiedosto, palvelin, tiedostopolku):
+	'''
+	Poista etäpalvelimella oleva tiedosto SSH yli
+	'''
+	tiedostopolku = siisti_tiedostonimi(tiedostopolku)
+	print(["ssh", palvelin, "rm{:s} {:s}".format(" -r"*(not(vaintiedosto)), tiedostopolku)])
+	koodi = subprocess.run(["ssh", palvelin, "rm{:s} \"{:s}\"".format(" -r"*(not(vaintiedosto)), tiedostopolku)], capture_output=True)
+	# print(koodi)
+	if koodi.returncode != 1:
+		return(True, "")
+	return(False, str(koodi.stderr))
