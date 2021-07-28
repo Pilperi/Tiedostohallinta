@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="tiedostohallinta",
-    version="2021.03.29",
+    version="2021.07.28",
     url="https://github.com/Pilperi/Tiedostohallinta",
     author="Pilperi",
     description="Sekalainen kattaus tiedostonhallintatyökaluja",
