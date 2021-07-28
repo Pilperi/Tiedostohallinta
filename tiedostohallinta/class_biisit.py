@@ -67,7 +67,7 @@ class Biisi():
 				try:
 					tagit = EasyID3(tiedostopolku)
 				except mtg.MutagenError as err:
-					print("   tiedosto kusee\n  {err}")
+					print(f"   tiedosto kusee\n  {err}")
 					tagit = {}
 				# print(tagit)
 				self.tiedostonimi	= os.path.basename(tiedostopolku)
@@ -88,7 +88,7 @@ class Biisi():
 				try:
 					tagit = FLAC(tiedostopolku)
 				except mtg.MutagenError as err:
-					print("   tiedosto kusee\n  {err}")
+					print(f"   tiedosto kusee\n  {err}")
 					tagit = {}
 				self.tiedostonimi	= os.path.basename(tiedostopolku)
 				if tagit.get("album"):
@@ -117,7 +117,7 @@ class Biisi():
 				try:
 					tagit = mtg.File(tiedostopolku)
 				except mtg.MutagenError as err:
-					print("   tiedosto kusee\n  {err}")
+					print(f"   tiedosto kusee\n  {err}")
 					tagit = {}
 				self.tiedostonimi	= os.path.basename(tiedostopolku)
 				if tagit.get("Author"):
