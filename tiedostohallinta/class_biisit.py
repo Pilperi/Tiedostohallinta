@@ -506,9 +506,9 @@ def kirjaa(asetukset=None):
 		elif not all([os.path.isdir(k) for k in asetukset.get("LOKAALIT_MUSIIKIT")]):
 			pass
 		# Sama toiselle avaimelle (tulostiedostojen ei vielä tarvitse olla olemassa)
-		if type(asetukset.get("LOKAALIT_TIETOKANNAT")) not in (list,tuple):
+		elif type(asetukset.get("LOKAALIT_TIETOKANNAT")) not in (list,tuple):
 			pass
-		elif not all([type(k) is str for k in asetukset.get("LOKAALIT_TIETOKANNAT")]):
+		elif all([type(k) is str for k in asetukset.get("LOKAALIT_TIETOKANNAT")]):
 			validit_asetukset = True
 	# Tarkista myös oletusasetusten järkevyys
 	validit_oletusasetukset = False
@@ -518,9 +518,9 @@ def kirjaa(asetukset=None):
 		pass
 	elif not all([os.path.isdir(k) for k in kvak.LOKAALIT_MUSIIKIT]):
 		pass
-	if type(kvak.LOKAALIT_TIETOKANNAT) not in (list,tuple):
+	elif type(kvak.LOKAALIT_TIETOKANNAT) not in (list,tuple):
 		pass
-	elif not all([type(k) is str for k in kvak.LOKAALIT_TIETOKANNAT]):
+	elif all([type(k) is str for k in kvak.LOKAALIT_TIETOKANNAT]):
 		validit_oletusasetukset = True
 
 	# Jos syötetyt asetukset on validit, käytetään niitä
