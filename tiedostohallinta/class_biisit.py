@@ -479,15 +479,68 @@ class Artistipuu():
 			for albumi in [alb for alb in self.artistit[artisti] if alb is not None]:
 				self.artistit[artisti][albumi] = self.jarkkaa_biisinumeron_mukaan(self.artistit[artisti][albumi])
 
-def kirjaa():
+def kirjaa(asetukset=None):
 	'''
 	Kirjaa musiikkitiedot tietokantatiedostoihin.
+	Ottaa vapaaehtoisena sisäänmenoparametrina diktin
+	jossa määritelty mistä luetaan musiikkia ja mihin
+	kansioon niistä lasketut tietokannat pitäisi talllentaa.
+	Diktin formaattina
+	{"LOKAALIT_MUSIIKIT": [kansio_1, kansio_2, ..., kansio_n],
+	 "LOKAALIT_MUSIIKIT": [tulostiedosto_1, tulostiedosto_2, ..., tulostiedosto_n]}
+	siten että arvot menevät pareittain indeksoidusti: kansion_1 musiikit kirjataan
+	tiedostoon tulostiedosto_1 jne.
+
+	(tilapäisratkaisu kunnes jaksan vääntää kunnon asetusolion kasaan)
 	'''
+	# Tarkista annettiinko asetuksia ja jos, onko ne validit
+	validit_asetukset = False
+	if type(asetukset) is dict:
+		# Avain läsnä asetuksissa
+		if type(asetukset.get("LOKAALIT_MUSIIKIT")) not in (list,tuple):
+			pass
+		# Avaimen takana lista stringejä
+		elif not all([type(k) is str for k in asetukset.get("LOKAALIT_MUSIIKIT")]):
+			pass
+		# Kaikki stringit olemassaolevia kansioita
+		elif not all([os.path.isdir(k) for k in asetukset.get("LOKAALIT_MUSIIKIT")]):
+			pass
+		# Sama toiselle avaimelle (tulostiedostojen ei vielä tarvitse olla olemassa)
+		if type(asetukset.get("LOKAALIT_TIETOKANNAT")) not in (list,tuple):
+			pass
+		elif not all([type(k) is str for k in asetukset.get("LOKAALIT_TIETOKANNAT")]):
+			validit_asetukset = True
+	# Tarkista myös oletusasetusten järkevyys
+	validit_oletusasetukset = False
+	if type(kvak.LOKAALIT_MUSIIKIT) not in (list,tuple):
+		pass
+	elif not all([type(k) is str for k in kvak.LOKAALIT_MUSIIKIT]):
+		pass
+	elif not all([os.path.isdir(k) for k in kvak.LOKAALIT_MUSIIKIT]):
+		pass
+	if type(kvak.LOKAALIT_TIETOKANNAT) not in (list,tuple):
+		pass
+	elif not all([type(k) is str for k in kvak.LOKAALIT_TIETOKANNAT]):
+		validit_oletusasetukset = True
+
+	# Jos syötetyt asetukset on validit, käytetään niitä
+	if validit_asetukset:
+		mestat = {"LOKAALIT_MUSIIKIT":    asetukset.get("LOKAALIT_MUSIIKIT"),
+                  "LOKAALIT_TIETOKANNAT": asetukset.get("LOKAALIT_TIETOKANNAT")}
+	# Jos ei, niin käytä oletuksena paikallisissa asetuksissa määriteltyjä
+	elif validit_oletusasetukset:
+		mestat = {"LOKAALIT_MUSIIKIT":    kvak.LOKAALIT_MUSIIKIT,
+                  "LOKAALIT_TIETOKANNAT": kvak.LOKAALIT_TIETOKANNAT}
+	# Muutoin kaikki on menetetty
+	else:
+		print("Ei ole mitään oikeita kansioita joista lukea musiikkia tai mihin kirjoittaa tulokset")
+		return
+
 	t1 = time.time()
-	for i,lokaali_musakansio in enumerate(kvak.LOKAALIT_MUSIIKIT):
+	for i,lokaali_musakansio in enumerate(mestat["LOKAALIT_MUSIIKIT"]):
 		puu = Tiedostopuu(lokaali_musakansio, tiedostotyyppi=Biisi)
 		puu.kansoita()
-		tietokantatiedosto = kvak.LOKAALIT_TIETOKANNAT[i]
+		tietokantatiedosto = mestat["LOKAALIT_TIETOKANNAT"][i]
 		f = open(tietokantatiedosto, "w+")
 		f.write(str(puu))
 		f.close()
