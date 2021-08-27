@@ -35,6 +35,7 @@ VOIMASUHTEET         = {
 
 # Tunnista käytettävä kone kotikansion perusteella.
 KOTIKANSIO = os.path.expanduser("~")
+LOGITIEDOSTO = os.path.join(KOTIKANSIO, "tiedostohallinta_logi") # todo
 LOKAALI_KONE = os.path.basename(KOTIKANSIO)
 if VERBOOSI:
 	print(f"Lokaali kone: {LOKAALI_KONE}")
