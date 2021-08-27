@@ -1,4 +1,5 @@
 import os
+import time
 import shutil
 import subprocess
 import hashlib
@@ -83,6 +84,16 @@ def hanki_hash(tiedosto, binmode=True):
 						break
 					md5.update(data.encode("utf-8"))
 	return(md5.hexdigest())
+
+def tiedoston_aikaleima(tiedosto):
+	'''
+	Anna tiedoston muokkausajan aikaleima
+	kokonaislukumuodossa.
+	'''
+	aika = 0
+	if os.path.isfile(tiedosto):
+		aika = int(time.strftime("%Y%m%H%M"))
+	return(aika)
 
 #------------Funktiot kansiorakenteiden läpikäymiseen--------------------------
 def paate(tiedosto):
