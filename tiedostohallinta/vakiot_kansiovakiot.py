@@ -44,7 +44,10 @@ if VERBOOSI:
 config = configparser.ConfigParser(default_section="pilperi")
 if VERBOOSI:
 	print("Luetaan asetukset .ini-tiedostosta")
-config.read(pkg_resources.resource_stream(__name__, 'kansiovakiot.ini'))
+if os.path.exists(os.path.join(KOTIKANSIO, "kansiovakiot.ini")):
+	config.read(os.path.join(KOTIKANSIO, "kansiovakiot.ini"))
+else:
+	config.read(pkg_resources.resource_stream(__name__, 'kansiovakiot.ini'))
 # Luetaan määrittelyt configista
 # Otetaan lokaalia konetta vastaava asetuskokoonpano
 if LOKAALI_KONE in config:
