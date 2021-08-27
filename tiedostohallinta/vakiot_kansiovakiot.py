@@ -51,7 +51,7 @@ else:
 # Luetaan määrittelyt configista
 # Otetaan lokaalia konetta vastaava asetuskokoonpano
 if LOKAALI_KONE in config:
-	ASETUSKOKOONPANO = list(config.keys())[0]
+	ASETUSKOKOONPANO = LOKAALI_KONE
 	if VERBOOSI:
 		print(f"Käytetään arvoja {ASETUSKOKOONPANO}")
 # Mitään ei ole määritelty: laitetaan pääkone
