@@ -1,11 +1,178 @@
 import os
 import shutil
-from . import vakiot_kansiovakiot as kvak
-from . import funktiot_kansiofunktiot as kfun
-from . import funktiot_logifunktiot as logfun
-from .class_tiedosto import Tiedosto
-from .class_biisit import Biisi
-from .class_tiedostopuu import Tiedostopuu
+import datetime
+from tiedostohallinta import vakiot_kansiovakiot as kvak
+from tiedostohallinta import funktiot_kansiofunktiot as kfun
+from tiedostohallinta import funktiot_logifunktiot as logfun
+from tiedostohallinta.class_tiedosto import Tiedosto
+from tiedostohallinta.class_biisi import Biisi
+from tiedostohallinta.class_tiedostopuu import Tiedostopuu
+
+def poista_ylimaaraiset(isantapuu, isantapalvelin, lapsipuu,
+						lapsipalvelin, tulosta=False, logitiedosto=None):
+	'''
+	Poista ylimääräiset tiedostot lapsipuusta ja kovelevyltä.
+	'''
+	ylimaaraiset = lapsipuu - isantapuu
+	# Ylimääräiset tiedostot veks (samasta tasosta)
+	for tiedosto in ylimaaraiset.tiedostot:
+		lahdetiedosto = lapsipuu.hae_nykyinen_polku() + tiedosto.tiedostonimi
+		# Tiedosto etäpalvelimella
+		if type(lapsipalvelin) is str:
+			logfun.kirjaa(logitiedosto, f"Poista tiedosto\n   {lahdetiedosto}\n   palvelimelta\n   {lapsipalvelin}", 3)
+			if kvak.VERBOOSI:
+				print(f"Poista tiedosto\n   {lahdetiedosto}\n   palvelimelta\n   {lapsipalvelin}")
+			if not kvak.TESTIMOODI:
+				poistettu = False
+				for i in range(5):
+					poistettu, virhe = kfun.etapoisto(True, lapsipalvelin, lahdetiedosto)
+					if poistettu or "No such file or directory" in virhe:
+						poistetut_tiedostot.append(indeksi)
+						break
+		# Lokaali tiedosto
+		else:
+			logfun.kirjaa(logitiedosto, f"Poista tiedosto\n   {lahdetiedosto}\n   lokaalilta kovalevyltä", 3)
+			if kvak.VERBOOSI:
+				print(f"Poista tiedosto\n   {lahdetiedosto}\n   lokaalilta kovalevyltä")
+			if not kvak.TESTIMOODI:
+				os.remove(lahdetiedosto)
+
+	# Alikansiot rekursiivisesti
+	for kansio in ylimaaraiset.alikansiot:
+		# Löytyy molemmista: sukella sisään ja katso mikä eroaa
+		isantavastine = isantapuu.alikansio(kansio.kansio)
+		if isantavastine is not None:
+			poista_ylimaaraiset(isantavastine, isantapalvelin, kansio, lapsipalvelin, tulosta, logitiedosto)
+		# Ei löydy -> koko kansiota ei pitäisi olla (poista suoraan)
+		else:
+			lahdekansio = kansio.hae_nykyinen_polku()
+			# Tiedosto etäpalvelimella
+			if type(lapsipalvelin) is str:
+				logfun.kirjaa(logitiedosto, f"Poista kansio\n   {lahdekansio}\n   palvelimelta\n   {lapsipalvelin}", 3)
+				if kvak.VERBOOSI:
+					print(f"Poista kansio\n   {lahdekansio}\n   palvelimelta\n   {lapsipalvelin}")
+				if not kvak.TESTIMOODI:
+					poistettu = False
+					for i in range(5):
+						poistettu, virhe = kfun.etapoisto(False, lapsipalvelin, lahdekansio)
+						if poistettu or "No such file or directory" in virhe:
+							break
+			# Lokaali tiedosto
+			else:
+				logfun.kirjaa(logitiedosto, f"Poista kansio\n   {lahdekansio}\n   lokaalilta kovalevyltä", 3)
+				if kvak.VERBOOSI:
+					print(f"Poista kansio\n   {lahdekansio}\n   lokaalilta kovalevyltä")
+				if not kvak.TESTIMOODI:
+					shutil.rmtree(lahdekansio)
+
+def kopioi_puuttuvat(isantapuu, isantapalvelin, lapsipuu, lapsipalvelin,
+					 tulosta=False, logitiedosto=None):
+	'''
+	Kopioi puuttuvat tiedostot ja kansiot
+	isäntäpalvelimelta lapsipalvelimelle.
+	'''
+	puuttuvat = isantapuu - lapsipuu
+	kohdejuuri = lapsipuu.hae_nykyinen_polku()
+	# Tiedostot
+	for tiedosto in puuttuvat.tiedostot:
+		kfun.lataa(
+			vaintiedosto=True,
+			lahdepalvelin=isantapalvelin,
+			lahdepolku=puuttuvat.hae_nykyinen_polku()+"/"+tiedosto.tiedostonimi,
+			kohdepalvelin=lapsipalvelin,
+			kohdepolku=kohdejuuri+"/"+tiedosto.tiedostonimi
+			)
+	# Kansiot
+	for kansio in puuttuvat.alikansiot:
+		# On molemmissa: sukella sisään
+		if any(k.kansio==kansio.kansio for k in lapsipuu.alikansiot):
+			kopioi_puuttuvat(
+				isantapuu=kansio,
+				isantapalvelin=isantapalvelin,
+				lapsipuu=[k for k in lapsipuu.alikansiot if k.kansio==kansio.kansio][0],
+				lapsipalvelin=lapsipalvelin,
+				tulosta=tulosta,
+				logitiedosto=logitiedosto
+				)
+		# Muutoin: lataa koko kansio
+		else:
+			kfun.lataa(
+				vaintiedosto=False,
+				lahdepalvelin=isantapalvelin,
+				lahdepolku=kansio.hae_nykyinen_polku(),
+				kohdepalvelin=lapsipalvelin,
+				kohdepolku=kohdejuuri+"/"+kansio.kansio
+				)
+
+def muodosta_latauslista(erotuspuu, maaranpaapuu):
+	'''
+	Muodosta minimaalinen määrä ladattavien polkujen lista.
+	Läh. lataa kokonaisia puuttuvia kansioita aina kun mahdollista,
+	niin ylhäältä puusta kuin järkevää ja vain yhden kerran.
+
+	Sisään
+	------
+	erotuspuu : Tiedostopuu
+		Puuttuvat asiat jotka pitää ladata/lähettää
+	maaranpaapuu : Tiedostopuu
+		Referenssipuu, mitä määränpäässä on jo olemassa
+		(älä lataa tiedostoa kansioon jota ei ole
+		äläkä alikansiota kansioon jota ei ole)
+
+	Ulos
+	----
+	lista stringejä
+		Erotuspuu muotoiltuna listaksi tiedosto- tai kansiopolkuja
+		jotka voi sitten tunkea scp:hen tai mihin ikinä.
+	'''
+	paluulista = []
+	# Juuritason tiedostot menevät sellaisenaan
+	for tiedosto in erotuspuu.tiedostot:
+		paluulista.append(
+			maaranpaapuu.hae_nykyinen_polku()
+			+tiedosto.tiedostonimi
+			)
+	# Kansiot joko sellaisinaan (kun puuttuu kokonaan)
+	# tai rekursiivisesti (sisältä puuttuu jotain)
+	for kansio in erotuspuu.alikansiot:
+		vastaava_maaranpaassa = maaranpaapuu.alikansio(kansio.kansio)
+		# Määränpäässä ei ole koko kansiota laisinkaan
+		if vastaava_maaranpaassa is None:
+			paluulista.append(
+				maaranpaapuu.hae_nykyinen_polku()
+				+kansio.kansio
+				)
+		# Määränpäässä on kansio eli sieltä sisältä uupuu jotain
+		else:
+			kansiossa_uupuvat = muodosta_latauslista(
+				erotuspuu=kansio,
+				maaranpaapuu=vastaava_maaranpaassa
+				)
+			paluulista += kansiossa_uupuvat
+	return paluulista
+
+
+def vertaa_puita(isantapuu=None, isantapalvelin=None, lapsipuu=None, lapsipalvelin=None, tulosta=False, logitiedosto=None):
+	'''
+	Vertaa lapsipuuta isäntäpuuhun.
+	Jos lapsipuussa on kansioita tai tiedostoja jotka
+	puuttuvat isäntäpuusta, poista ne (puusta ja kovalevyltä)
+	Jos lapsipuusta puuttuu tiedostoja tai kansioita joita
+	isäntäpuussa on, tai isäntäpuun versiot tiedostoista on uudempia,
+	kopioi ne isäntäpuusta lokaaliin tiedostojärjestelmään.
+
+	Käy koko puu rekursiivisesti läpi.
+	Tiedostosiirrot käyvät SCP:llä, muodossa scp isantapalvelin:asia lapsipalvelin:asia
+	Yleensä näistä toinen on lokaali tiedostojärjestelmä, jolloin sen palvelimeksi laitetaan None.
+	'''
+	if not isinstance(isantapuu, Tiedostopuu):
+		return(None)
+	if not isinstance(lapsipuu, Tiedostopuu):
+		return(None)
+	poista_ylimaaraiset(isantapuu, isantapalvelin, lapsipuu, lapsipalvelin, tulosta, logitiedosto)
+	kopioi_puuttuvat(isantapuu, isantapalvelin, lapsipuu, lapsipalvelin, tulosta=False, logitiedosto=None)
+
+
 
 def vertaa_puita(isantapuu=None, isantapalvelin=None, lapsipuu=None, lapsipalvelin=None, tulosta=False, logitiedosto=None):
 	'''

@@ -1,8 +1,9 @@
 import os
-import time
 import shutil
 import subprocess
 import hashlib
+from datetime import datetime
+
 from . import vakiot_kansiovakiot as kvak
 
 def lataa(vaintiedosto, lahdepalvelin, lahdepolku, kohdepalvelin, kohdepolku):
@@ -129,7 +130,11 @@ def kansion_sisalto(kansio, tiedostomuodot=[]):
 	kansiot = []
 	if os.path.exists(kansio):
 		asiat = os.listdir(kansio)
-		tiedostot = [a for a in asiat if os.path.isfile(os.path.join(kansio,a)) and (not(tiedostomuodot) or paate(a)[1].lower() in tiedostomuodot)]
+		tiedostot = [
+			a for a in asiat
+			if os.path.isfile(os.path.join(kansio,a))
+			and (not(tiedostomuodot) or paate(a)[1].lower() in tiedostomuodot)
+			]
 		kansiot = [a for a in asiat if os.path.isdir(os.path.join(kansio,a))]
 	return(tiedostot,kansiot)
 

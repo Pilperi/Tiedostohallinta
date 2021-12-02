@@ -8,9 +8,11 @@ class Tiedosto:
 	Luokka yleisille tiedostoille.
 	Tiedot: tiedostonimi, muokkauspäivä, hash.
 	'''
+	TYYPPI = "tiedosto"
 	def __init__(self, kohteesta=None):
+		self.tyyppi = Tiedosto.TYYPPI
 		self.tiedostonimi = None
-		self.lisayspaiva  = None
+		self.lisayspaiva  = 0
 		self.hash         = None
 
 		# print(kohteesta)
@@ -22,6 +24,16 @@ class Tiedosto:
 		# Lukukohteena dikti (luettu tiedostosta tmv)
 		elif type(kohteesta) is dict:
 			self.lue_diktista(kohteesta)
+
+	@classmethod
+	def diktista(cls, dikti):
+		'''
+		Määritä diktin kautta.
+		'''
+		tiedosto = Tiedosto()
+		if isinstance(dikti, dict):
+			tiedosto.lue_diktista(dikti)
+		return tiedosto
 
 	def lue_tiedostosta(self, tiedostopolku):
 		'''
@@ -37,7 +49,7 @@ class Tiedosto:
 	def paivays(self, lue=None):
 		'''
 		Muodosta tai lue päiväys, formaatissa
-		(inttimuoto yyyymmdd, (yyyy, mm, dd))-tuple
+		(inttimuoto yyyymmddhhmm, (yyyy, mm, dd, hh, mimi))-tuple
 		'''
 		kokoversio	= 0
 		vuosi		= 0
@@ -82,12 +94,22 @@ class Tiedosto:
 		self.lisayspaiva  = dikti.get("lisayspaiva")
 		self.hash         = dikti.get("hash")
 
-	def __str__(self):
+	def diktiksi(self):
+		'''
+		Palauttaa
+		---------
+		dict
+			Diktiversio oliosta. Vain perusdatatyyppejä.
+		'''
 		diktiversio = {
 					"tiedostonimi":		self.tiedostonimi,
 					"lisayspaiva":		self.lisayspaiva,
 					"hash":		        self.hash
 					}
+		return diktiversio
+
+	def __str__(self):
+		diktiversio = self.diktiksi()
 		return(json.dumps(diktiversio))
 
 	def __bool__(self):
