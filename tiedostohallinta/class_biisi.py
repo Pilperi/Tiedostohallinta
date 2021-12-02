@@ -88,6 +88,7 @@ class Biisi():
 		'''
 		paate = kfun.paate(tiedostopolku)[1].lower()
 		if paate in kvak.MUSATIEDOSTOT:
+			self.tiedostonimi = os.path.basename(tiedostopolku)
 			self.hash = kfun.hanki_hash(tiedostopolku)
 			if paate == "mp3":
 				try:
@@ -96,7 +97,6 @@ class Biisi():
 					print(f"   tiedosto kusee\n  {err}")
 					tagit = {}
 				# print(tagit)
-				self.tiedostonimi	= os.path.basename(tiedostopolku)
 				if tagit.get("album"):
 					self.albuminimi		= tagit.get("album")[0]
 				if tagit.get("albumartist"):
@@ -116,7 +116,6 @@ class Biisi():
 				except mtg.MutagenError as err:
 					print(f"   tiedosto kusee\n  {err}")
 					tagit = {}
-				self.tiedostonimi	= os.path.basename(tiedostopolku)
 				if tagit.get("album"):
 					self.albuminimi		= tagit.get("album")[0]
 				if tagit.get("albumartist"):
@@ -145,7 +144,6 @@ class Biisi():
 				except mtg.MutagenError as err:
 					print(f"   tiedosto kusee\n  {err}")
 					tagit = {}
-				self.tiedostonimi	= os.path.basename(tiedostopolku)
 				if tagit.get("Author"):
 					self.albumiesittaja = tagit.get("Author")[0].value
 					self.esittaja		= self.albumiesittaja

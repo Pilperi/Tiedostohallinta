@@ -4,7 +4,7 @@ keskitetysti samassa paikassa.
 '''
 
 from tiedostohallinta.class_biisi import Biisi
-from tiedostohallinta.class_Tiedostopuu import Tiedostopuu
+from tiedostohallinta.class_tiedostopuu import Tiedostopuu
 
 class Hakukriteerit:
 	'''
@@ -139,7 +139,9 @@ class Hakukriteerit:
 		'''
 		tuloksia = False # Onko annetussa puussa käypiä hakutuloksia vai ei (rekursiota varten)
 		if self.tulospuu is None:
-			self.tulospuu = Tiedostopuu(puu.kansio, tiedostotyyppi=Biisi)
+			self.tulospuu = Tiedostopuu()
+			self.tulospuu.kansio = puu.kansio
+			self.tulospuu.kansio = "biisi"
 		for biisi in puu.tiedostot:
 			if self.tarkista_biisi(biisi, puu):
 				self.hakutuloksia += 1
@@ -157,9 +159,17 @@ class Hakukriteerit:
 			# On myös mahdollista että koko alikansio on validi,
 			# koska kansion nimessä on 'tiedostonimi'-hakustringin osuma.
 			if uusipuu is None:
-				alipuu = Tiedostopuu(alikansio.kansio, puu, puu.syvennystaso+1, tiedostotyyppi=Biisi)
+				alipuu = Tiedostopuu()
+				alipuu.kansio = alikansio.kansio
+				alipuu.edellinentaso = puu
+				alipuu.syvennystaso = puu.syvennystaso+1
+				alipuu.tiedostotyyppi = "biisi"
 			else:
-				alipuu = Tiedostopuu(alikansio.kansio, uusipuu, uusipuu.syvennystaso+1, tiedostotyyppi=Biisi)
+				alipuu = Tiedostopuu()
+				alipuu.kansio = alikansio.kansio
+				alipuu.edellinentaso = uusipuu
+				alipuu.syvennystaso = uusipuu.syvennystaso+1
+				alipuu.tiedostotyyppi = "biisi"
 			kansiossa_oli, tuloskansio = self.etsi_tietokannasta(alikansio, uusipuu=alipuu)
 			if kansiossa_oli and uusipuu is None:
 				tuloksia = True
@@ -323,7 +333,9 @@ def kirjaa(asetukset=None):
 
 	t1 = time.time()
 	for i,lokaali_musakansio in enumerate(mestat["LOKAALIT_MUSIIKIT"]):
-		puu = Tiedostopuu(lokaali_musakansio, tiedostotyyppi=Biisi)
+		puu = Tiedostopuu()
+		puu.kansio = lokaali_musakansio
+		puu.tiedostotyyppi = "biisi"
 		puu.kansoita()
 		tietokantatiedosto = mestat["LOKAALIT_TIETOKANNAT"][i]
 		f = open(tietokantatiedosto, "w+")
@@ -339,7 +351,8 @@ def lukutesti():
 	testata onnistuuko toisiminen yks yhteen.
 	'''
 	for tiedosto in kvak.LOKAALIT_TIETOKANNAT:
-		puu = Tiedostopuu(tiedostotyyppi=Biisi)
+		puu = Tiedostopuu()
+		puu.tiedostotyyppi = "biisi"
 		f = open(tiedosto, "r")
 		puu.lue_tiedostosta(f)
 		f.close()
@@ -352,7 +365,8 @@ if __name__ == "__main__":
 	kirjaa()
 	# Testaa hakukriteereiden käyttöä:
 	for tiedosto in kvak.LOKAALIT_TIETOKANNAT:
-		puu = Tiedostopuu(tiedostotyyppi=Biisi)
+		puu = Tiedostopuu()
+		puu.tiedostotyyppi=Biisi
 		f = open(tiedosto, "r")
 		puu.lue_tiedostosta(f)
 		f.close()
