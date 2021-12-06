@@ -17,10 +17,10 @@ def lataa(vaintiedosto, lahdepalvelin, lahdepolku, kohdepalvelin, kohdepolku):
 	# Paikallinen polku
 	else:
 		# kansiopolku = "\"{}\"".format(lahdepolku)
-		kansiopolku = "{}".format(siisti_tiedostonimi(lahdepolku))
+		kansiopolku = "{}".format(lahdepolku)
 	# Polku palvelimella
 	if kohdepalvelin:
-		kohde = "{}:{}".format(kohdepalvelin, siisti_tiedostonimi(kohdepolku))
+		kohde = "{}:\"{}\"".format(kohdepalvelin, siisti_tiedostonimi(kohdepolku))
 	# Paikallinen polku
 	else:
 		# kohde = "\"{}\"".format(kohdepolku)
@@ -30,8 +30,12 @@ def lataa(vaintiedosto, lahdepalvelin, lahdepolku, kohdepalvelin, kohdepolku):
 		print(f"{kansiopolku}->")
 		print(f"->{kohde}")
 	if vaintiedosto:
+		if kvak.VERBOOSI:
+			print(["scp", "-T", kansiopolku, kohde])
 		koodi = subprocess.call(["scp", "-T", kansiopolku, kohde])
 	else:
+		if kvak.VERBOOSI:
+			print(["scp","-r", "-T", kansiopolku, kohde])
 		koodi = subprocess.call(["scp","-r", "-T", kansiopolku, kohde])
 	return(True)
 

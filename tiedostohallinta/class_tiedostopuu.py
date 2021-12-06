@@ -177,7 +177,6 @@ class Tiedostopuu():
 		sallitut_paatteet = SALLITUT_PAATTEET.get(self.tiedostotyyppi.TYYPPI)
 		if not isinstance(sallitut_paatteet, (list,tuple)):
 			sallitut_paatteet = []
-		nykyinen_polku = self.hae_nykyinen_polku()
 		tiedostot, alikansiot = kfun.kansion_sisalto(
 			self.hae_nykyinen_polku(),
 			sallitut_paatteet
@@ -186,10 +185,9 @@ class Tiedostopuu():
 		# (tässä vaihtelee, minkä tyyppinen tiedosto kyseessä)
 		for tiedosto in tiedostot:
 			print("{}{}".format((self.syvennystaso+1)*" ", tiedosto))
-			self.tiedostot.append(
-				self.tiedostotyyppi(
-					os.path.join(self.hae_nykyinen_polku(), tiedosto)
-					))
+			polku = os.path.join(self.hae_nykyinen_polku(), tiedosto)
+			tiedosto_olio = self.tiedostotyyppi(kohteesta=polku)
+			self.tiedostot.append(tiedosto_olio)
 		# Alikansiot yhtä tasoa syvemmällä, ole näiden 'edellinenkansio'
 		for kansio in alikansiot:
 			print("{}{}".format((self.syvennystaso+1)*" ", kansio))

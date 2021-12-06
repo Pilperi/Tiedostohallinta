@@ -141,6 +141,7 @@ def muodosta_latauslista(erotuspuu, maaranpaapuu):
 			paluulista.append(
 				maaranpaapuu.hae_nykyinen_polku()
 				+kansio.kansio
+				+"/"
 				)
 		# Määränpäässä on kansio eli sieltä sisältä uupuu jotain
 		else:
