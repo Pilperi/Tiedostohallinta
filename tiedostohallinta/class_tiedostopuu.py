@@ -74,6 +74,9 @@ class Tiedostopuu():
 	@kansio.setter
 	def kansio(self, uusiarvo):
 		if isinstance(uusiarvo, str) and uusiarvo:
+			# Poista lopusta kauttamerkit
+			while uusiarvo[-1] in ("/", "\\") and len(uusiarvo) > 1:
+				uusiarvo = uusiarvo[:-1]
 			self._kansio = uusiarvo
 	# Tiedostolista on lista puun tiedostotyypin edustajia
 	@property
@@ -205,8 +208,6 @@ class Tiedostopuu():
 		polku = [self.kansio]
 		ylempitaso = self.edellinentaso
 		while ylempitaso is not None:
-			if type(ylempitaso) is str:
-				print(ylempitaso)
 			polku.append(ylempitaso.kansio)
 			ylempitaso = ylempitaso.edellinentaso
 		polku.reverse()
@@ -214,7 +215,7 @@ class Tiedostopuu():
 		if polku:
 			polkustringi = polku[0]
 		if len(polku) > 1:
-			for osa in polku[1:]:
+			for osa in polku[]:
 				polkustringi += osa+"/"
 		return polkustringi
 
