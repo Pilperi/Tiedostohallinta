@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 from tiedostohallinta import funktiot_kansiofunktiot as kfun
 from tiedostohallinta.class_biisi import Biisi
 from tiedostohallinta.class_tiedosto import Tiedosto
