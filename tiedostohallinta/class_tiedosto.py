@@ -1,7 +1,7 @@
 import os
 import time
 import json
-from . import funktiot_kansiofunktiot as kfun
+from tiedostohallinta import funktiot_kansiofunktiot as kfun
 
 class Tiedosto:
 	'''
