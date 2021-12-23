@@ -33,6 +33,14 @@ def lataa(vaintiedosto, lahdepalvelin, lahdepolku, kohdepalvelin, kohdepolku):
         # kohde = "\"{}\"".format(kohdepolku)
         kohde = "{}".format(kohdepolku)
 
+    # Kopioi paikallisen koneen sisällä
+    if (lahdepalvelin is None) and (kohdepalvelin is None):
+        fun = shutil.copytree
+        if vaintiedosto:
+            fun = shutil.copy2
+        fun(kansiopolku, kohde)
+        return True
+
     if vaintiedosto:
         koodi = subprocess.run(
             ["scp", "-T", kansiopolku, kohde],
@@ -247,7 +255,30 @@ def etapoisto(vaintiedosto, palvelin, tiedostopolku):
     '''
     Poista etäpalvelimella oleva tiedosto SSH yli
     '''
-    #tiedostopolku = siisti_tiedostonimi(tiedostopolku)
+    # Paikallinen tiedosto
+    if palvelin is None:
+        if not os.path.exists(tiedostopolku):
+            logging.debug("etapoisto: paikallinen polku\n"
+                +f"    {tiedostopolku}\n"
+                +"    on jo poistettu (ts. ei löydy)")
+            return True, ""
+        if os.path.isfile(tiedostopolku):
+            fun = os.remove
+            logging.debug("etapoisto: paikallinen polku\n"
+                +f"    {tiedostopolku}\n"
+                +"    on tiedosto")
+        elif os.path.isdir(tiedostopolku):
+            fun = os.removedirs
+            logging.debug("etapoisto: paikallinen polku\n"
+                +f"    {tiedostopolku}\n"
+                +"    on kansio")
+        else:
+            logging.debug("etapoisto: paikallinen polku\n"
+                +f"    {tiedostopolku}\n"
+                +"    ei ole tiedosto tai kansio")
+            return False, "Ei ole tiedosto tai kansio"
+        fun(tiedostopolku)
+        return True, ""
     logging.debug("etapoisto: {}".format([
         "ssh",
         palvelin,
