@@ -137,7 +137,7 @@ def lataa_puuttuvat(lahdepuu, lahdepalvelin, kohdepuu, kohdepalvelin):
     kohdejuuri = kohdepuu.kansio
     for kohdepolku in kohdetiedostot:
         lahdepolku = kohdepolku.replace(kohdejuuri, lahdejuuri)
-        vaintiedosto = kohdepolku[-1] in ("\\", "/")
+        vaintiedosto = kohdepolku[-1] not in ("\\", "/")
         logging.info(
             "lataa puuttuva {} {}:{}\nkohteeseen {}:{}".format(
                 int(vaintiedosto)*"tiedosto" + int(not vaintiedosto)*"kansio",
