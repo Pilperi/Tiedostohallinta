@@ -268,7 +268,7 @@ def etapoisto(vaintiedosto, palvelin, tiedostopolku):
                 +f"    {tiedostopolku}\n"
                 +"    on tiedosto")
         elif os.path.isdir(tiedostopolku):
-            fun = os.removedirs
+            fun = shutil.rmtree
             logging.debug("etapoisto: paikallinen polku\n"
                 +f"    {tiedostopolku}\n"
                 +"    on kansio")
@@ -278,6 +278,7 @@ def etapoisto(vaintiedosto, palvelin, tiedostopolku):
                 +"    ei ole tiedosto tai kansio")
             return False, "Ei ole tiedosto tai kansio"
         fun(tiedostopolku)
+        logging.debug("Poistettiin.")
         return True, ""
     logging.debug("etapoisto: {}".format([
         "ssh",
