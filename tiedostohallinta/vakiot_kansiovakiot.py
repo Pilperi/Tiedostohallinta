@@ -28,7 +28,7 @@ loglevel= getattr(logging, loglevel.upper())
 
 ASETUKSET = {}
 
-nyt = time.strftime("%Y%m%d%H%M",time.gmtime(time.time()))
+nyt = time.strftime("%Y%m%d%H%M",time.localtime(time.time()))
 
 # Tunnista käytettävä kone kotikansion perusteella.
 KOTIKANSIO = os.path.expanduser("~")
