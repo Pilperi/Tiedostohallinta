@@ -106,7 +106,7 @@ def lataa_tietokannat_palvelimelta(sijainnit):
             ))
         paluuarvo[t] = koodi
     logging.info(
-        "Ladattiin {sum(paluuarvo)}/{len(paluuarvo)} tietokantatiedostoa")
+        f"Ladattiin {sum(paluuarvo)}/{len(paluuarvo)} tietokantatiedostoa")
     return paluuarvo
 
 
@@ -157,6 +157,67 @@ def lataa_puuttuvat(lahdepuu, lahdepalvelin, kohdepuu, kohdepalvelin):
             "    {}".format(
                 int(koodi)*"ladattiin" + int(not koodi)*"ei onnistunut"
             ))
+
+
+def lataa_muuttuneet(lahdepuu, lahdepalvelin, kohdepuu, kohdepalvelin):
+    '''
+    Lataa muuttuneet tiedostot, joko paikalliselta koneelta
+    etäkoneelle tai toisin päin.
+
+    Sisään
+    ------
+    lahdepuu : Tiedostopuu
+        Lähteen kansiorakenne Tiedostopuun muodossa.
+        Tiedostot jotka on uudempia täällä kuin kohdepuussa
+        ladataan kohdepalvelimen suuntaan.
+    lahdepalvelin : str tai None
+        Palvelin jonka suunnalta asioita ladataan.
+        Jos str, etäpalvelin (esim "pettankone").
+        Jos None, paikallinen kone.
+    kohdepuu : Tiedostopuu
+        Puu josta katsotaan että mikä kaikki siellä on vanhentunutta.
+    kohdepalvelin : str tai None
+        Palvelin jonka suuntaan ladataan.
+        Jos str, etäkone, None paikalliselle koneelle.
+    '''
+    for tiedosto in lahdepuu.tiedostot:
+        kohdepuun_tiedosto = kohdepuu.tiedosto(tiedosto.tiedostonimi)
+        if (isinstance(kohdepuun_tiedosto, lahdepuu.tiedostotyyppi)
+            and kohdepuun_tiedosto.lisayspaiva < tiedosto.lisayspaiva
+            and kohdepuun_tiedosto.hash != tiedosto.hash
+            ):
+            lahdepolku = os.path.join(
+                lahdepuu.hae_nykyinen_polku(),
+                tiedosto.tiedostonimi
+                )
+            kohdepolku = os.path.join(
+                kohdepuu.hae_nykyinen_polku(),
+                tiedosto.tiedostonimi
+                )
+            logging.info(
+                f"tiedosto {tiedosto.tiedostonimi} on vanhentunut:\n"
+                +f"  {tiedosto.lisayspaiva} > {kohdepuun_tiedosto.lisayspaiva}\n"
+                +f"  {tiedosto.hash} != {kohdepuun_tiedosto.hash}\n"
+                +", lataa kohteesta\n"
+                +f"    {lahdepalvelin}:{lahdepolku}\n"
+                +"kohteeseen\n"
+                +f"    {kohdepalvelin}:{kohdepolku}"
+                )
+            koodi = kfun.lataa(
+    			vaintiedosto=True,
+    			lahdepalvelin=lahdepalvelin,
+    			lahdepolku=lahdepolku,
+    			kohdepalvelin=kohdepalvelin,
+    			kohdepolku=kohdepolku
+    			)
+            logging.info(
+                "    {}".format(
+                    int(koodi)*"ladattiin" + int(not koodi)*"ei onnistunut"
+                ))
+    for kansio in lahdepuu.alikansiot:
+        kohdekansio = kohdepuu.alikansio(kansio.kansio)
+        if isinstance(kohdekansio, Tiedostopuu):
+            lataa_muuttuneet(kansio, lahdepalvelin, kohdekansio, kohdepalvelin)
 
 
 def poista_ylimaaraiset(lahdepuu, kohdepuu, kohdepalvelin):

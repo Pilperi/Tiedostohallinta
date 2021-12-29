@@ -243,6 +243,17 @@ class Tiedostopuu():
             alipuissa += alipuu.sisallon_maara()[0]
         return itsessa+alipuissa, itsessa, alipuissa
 
+    def tiedosto(self, nimi):
+        '''
+        Hae tiedosto nimen perusteella.
+        Jos ei löydy, palauttaa None.
+        Muussa tapauksessa tiedoston pointterin.
+        '''
+        for tiedosto in self.tiedostot:
+            if tiedosto.tiedostonimi == nimi:
+                return tiedosto
+        return None
+
     def alikansio(self, nimi):
         '''
         Hae alikansio nimen perusteella.
@@ -250,7 +261,7 @@ class Tiedostopuu():
         '''
         for kansio in self.alikansiot:
             if kansio.kansio == nimi:
-                return(kansio)
+                return kansio
         return None
 
     def sisaltaa_kansion(self, kansio):
