@@ -27,14 +27,15 @@ TYOKANSIO = os.path.join(KOTIKANSIO, ".tiedostohallinta")
 if not os.path.isdir(TYOKANSIO):
     os.mkdir(TYOKANSIO)
     print(f"Tehtiin kansio {TYOKANSIO}")
-shutil.copyfile(
-    os.path.join(
-        os.path.dirname(__file__),
-        "tiedostohallinta",
-        "data",
-        "kansiovakiot.ini"),
-    os.path.join(TYOKANSIO, "kansiovakiot.ini"),
-    )
-print("Kopioitiin asetustiedosto paikkaan {}".format(
-    os.path.join(TYOKANSIO, "kansiovakiot.ini")
-    ))
+if not os.path.isfile(os.path.join(TYOKANSIO, "kansiovakiot.ini")):
+    shutil.copyfile(
+        os.path.join(
+            os.path.dirname(__file__),
+            "tiedostohallinta",
+            "data",
+            "kansiovakiot.ini"),
+        os.path.join(TYOKANSIO, "kansiovakiot.ini"),
+        )
+    print("Kopioitiin asetustiedosto paikkaan {}".format(
+        os.path.join(TYOKANSIO, "kansiovakiot.ini")
+        ))
