@@ -115,8 +115,8 @@ def main():
         logging.debug("Poistettu")
         logging.info(
             "Lataa muuttuneet"
-            +f"palvelimelta {lahdepalvelin}"
-            +f"palvelimelle {kohdepalvelin}")
+            +f" palvelimelta {lahdepalvelin}"
+            +f" palvelimelle {kohdepalvelin}")
         pfun.lataa_muuttuneet(
             lahdepuu=lahdepuu,
             lahdepalvelin=lahdepalvelin,
@@ -126,8 +126,8 @@ def main():
         logging.debug("Ladattu")
         logging.info(
             "Lataa puuttuvat"
-            +f"palvelimelta {lahdepalvelin}"
-            +f"palvelimelle {kohdepalvelin}")
+            +f" palvelimelta {lahdepalvelin}"
+            +f" palvelimelle {kohdepalvelin}")
         pfun.lataa_puuttuvat(
             lahdepuu=lahdepuu,
             lahdepalvelin=lahdepalvelin,

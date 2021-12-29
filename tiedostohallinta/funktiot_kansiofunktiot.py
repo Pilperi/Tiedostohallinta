@@ -113,8 +113,10 @@ def tiedoston_aikaleima(tiedosto):
     '''
     aika = 0
     if os.path.isfile(tiedosto):
-        aika = int(datetime.fromtimestamp(os.path.getmtime("Warranty.pdf")).strftime("%Y%m%H%M"))
-    return(aika)
+        aika = int(datetime.fromtimestamp(
+            os.path.getmtime(tiedosto)).strftime("%Y%m%H%M")
+            )
+    return aika
 
 #------------Funktiot kansiorakenteiden läpikäymiseen--------------------------
 def paate(tiedosto):
