@@ -28,6 +28,7 @@ loglevel= getattr(logging, loglevel.upper())
 
 ASETUKSET = {}
 
+IP = "http://127.0.0.1/"
 nyt = time.strftime("%Y%m%d%H%M",time.localtime(time.time()))
 
 # Tunnista käytettävä kone kotikansion perusteella.
