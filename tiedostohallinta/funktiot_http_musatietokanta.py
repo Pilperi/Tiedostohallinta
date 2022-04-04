@@ -110,7 +110,7 @@ def etsi_tietokannasta(nimi, hakukriteerit, osoite):
         Attribuutteina siinä on vastaus, virhe, koodi.
     '''
     LOGGER.debug(f"Suorita haku tietokannasta {nimi}")
-    pyynto = Pyynto("etsi_tietokannasta", hakukriteerit)
+    pyynto = Pyynto("etsi_tietokannasta", nimi, hakukriteerit)
     return suorita_pyynto(pyynto, osoite)
 
 
@@ -140,7 +140,7 @@ def anna_latauslista(puu, osoite):
     return suorita_pyynto(pyynto, osoite)
 
 
-def lataa_tiedosto_kansioon(latauspolku, kohdepolku, osoite):
+def lataa_biisi_kansioon(latauspolku, kohdepolku, osoite):
     '''
     Lataa palvelimelta tiedosto ja sijoita se osoitettuun kansioon.
     Kerro onnistuiko vaiko eikö onnistunut.
@@ -159,11 +159,17 @@ def lataa_tiedosto_kansioon(latauspolku, kohdepolku, osoite):
         esim. "http://127.0.0.1:5000/" tai "http://localhost:5000/"
     '''
     try:
-        vastaus = requests.get(osoite+"biisi", latauspolku)
+        vastaus = requests.get(
+            osoite+"musatietokanta/biisi",
+            json={"polku": latauspolku}
+            )
         if vastaus.status_code != 200:
             return False
-        with open(kohdepolku, 'wb') as filu:
-            shutil.copyfileobj(vastaus.raw, filu)
+        with open(kohdepolku, 'wb+') as filu:
+            for chunk in vastaus.iter_content(chunk_size=1024):
+                if chunk:
+                    filu.write(chunk)
     except requests.exceptions.ConnectionError as err:
         LOGGER.error(f"Ei saatu yhteyttä palvelimeen: {err}")
         return False
+    return True
