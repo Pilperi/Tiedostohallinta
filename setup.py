@@ -4,13 +4,13 @@ import setuptools
 
 setuptools.setup(
     name="tiedostohallinta",
-    version="2021.12.29",
+    version="2022.04.06",
     url="https://github.com/Pilperi/Tiedostohallinta",
     author="Pilperi",
     description="Sekalainen kattaus tiedostonhallintatyökaluja",
     long_description=open('README.md').read(),
     packages=setuptools.find_packages(),
-    install_requires=["mutagen"],
+    install_requires=["mutagen", "requests"],
 	python_requires=">=3.8, <4",
     classifiers=[
         'Programming Language :: Python',
