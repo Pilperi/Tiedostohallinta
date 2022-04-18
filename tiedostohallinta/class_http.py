@@ -183,6 +183,7 @@ class Vastaus:
         str,
         list,
         dict,
+        bool,
         )
     def __init__(self, *args, **kwargs):
         '''

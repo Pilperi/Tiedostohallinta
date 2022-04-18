@@ -37,7 +37,7 @@ def suorita_pyynto(pyynto, osoite):
             osoite+"musatietokanta", json=pyynto.json())
             )
         return vastaus
-    except requests.exceptions.ConnectionError as err:
+    except requests.exceptions.RequestException as err:
         LOGGER.error(f"Ei saatu yhteyttä palvelimeen: {err}")
         return Vastaus(None, err)
 
@@ -164,12 +164,14 @@ def lataa_biisi_kansioon(latauspolku, kohdepolku, osoite):
             json={"polku": latauspolku}
             )
         if vastaus.status_code != 200:
-            return False
+            errmsg = f"{latauspolku}:\n{vastaus.status_code}\n{vastaus.text}"
+            return Vastaus(False, errmsg)
         with open(kohdepolku, 'wb+') as filu:
             for chunk in vastaus.iter_content(chunk_size=1024):
                 if chunk:
                     filu.write(chunk)
     except requests.exceptions.ConnectionError as err:
-        LOGGER.error(f"Ei saatu yhteyttä palvelimeen: {err}")
-        return False
-    return True
+        errmsg = f"Ei saatu yhteyttä palvelimeen: {err}"
+        LOGGER.error(errmsg)
+        return Vastaus(False, errmsg)
+    return Vastaus(True, None)
