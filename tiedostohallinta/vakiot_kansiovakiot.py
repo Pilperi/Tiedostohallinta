@@ -19,7 +19,7 @@ parser.add_argument(
     default="INFO",
     choices=["INFO", "DEBUG", "WARNING", "ERROR", "CRITICAL"],
     help='Säädä loggauksen tasoa. Oletuksena INFO (vain isot askeleet)')
-args = parser.parse_args()
+args, _ = parser.parse_known_args()
 if isinstance(args.log, str):
     loglevel = args.log
 elif isinstance(args.log, list) and args.log:
